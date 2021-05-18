@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/product.dart';
+import './product.dart';
 
 class Products with ChangeNotifier {
   //nombramos la variable con la _ para dejar claro que no debe ser accesible desde fuera de la clase.
@@ -43,6 +43,11 @@ class Products with ChangeNotifier {
   // un getter público (sin la _) el cual retorna una copia de _items.
   List<Product> get items {
     return [..._items];
+  }
+
+  // Es mejor mover la lógica afuera de los widgets, por ejemplo dejarla en la clase Provider
+  Product findById(String id) {
+    return _items.firstWhere((product) => product.id == id);
   }
 
   // no queremos que se pueda modificar el valor de la variable en cualquier parte de la app

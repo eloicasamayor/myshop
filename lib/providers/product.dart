@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 //foundation.dart nos permite usar el decorator @required
 
-class Product {
+class Product with ChangeNotifier {
   final String id;
   final String title;
   final String description;
@@ -19,4 +19,11 @@ class Product {
     @required this.imageUrl,
     this.isFavorite = false,
   });
+
+  //méodo para cambiar el valor de isFavorite. Si era true será false, y si era false será true.
+  void toggleFavoriteStatus() {
+    isFavorite = !isFavorite;
+    //avisamos a todos los listeners con el notifyListeners()
+    notifyListeners();
+  }
 }
