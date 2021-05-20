@@ -20,7 +20,7 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  //méodo para cambiar el valor de isFavorite. Si era true será false, y si era false será true.
+  //método para invertir el valor de isFavorite. Si era true será false, y si era false será true.
   void toggleFavoriteStatus() {
     isFavorite = !isFavorite;
     //avisamos a todos los listeners con el notifyListeners()

@@ -45,6 +45,10 @@ class Products with ChangeNotifier {
     return [..._items];
   }
 
+  List<Product> get favoriteItems {
+    return _items.where((element) => element.isFavorite == true).toList();
+  }
+
   // Es mejor mover la lógica afuera de los widgets, por ejemplo dejarla en la clase Provider
   Product findById(String id) {
     return _items.firstWhere((product) => product.id == id);
