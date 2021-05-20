@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:myshop/providers/cart.dart';
 import 'package:provider/provider.dart';
 
 import './screens/product_detail_screen.dart';
 import './screens/products_overview_screen.dart';
 import './providers/products_provider.dart';
+import './providers/cart.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,12 +14,27 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // envolvemos MaterialApp con el widget ChangeNotifierProvider
     // nos permite definir una clase, y cuando esa clase cambie, todos los hijos que estén escuchando (no todos los hijos, solo los que están escuchando) ejecutarán build()
-    return ChangeNotifierProvider(
+
+    // Tambien podemos definir múltiples clases como providers, mediante el widget MultiProvider
+    // en el atributo providers ponemos todos los providers en una lista.
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (ctx) => Products(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => Cart(),
+        ),
+      ],
+
       //return ChangeNotifierProvider.value(
       // en el argumento create, se crea una instancia de la clase del Data Provider.
-      create: (ctx) => Products(),
+
       //value: Products(),
+      //return ChangeNotifierProvider(
+      //create: (ctx) => Products(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'MyShop',
         theme: ThemeData(
           primarySwatch: Colors.purple,
