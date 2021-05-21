@@ -26,7 +26,32 @@ class Cart with ChangeNotifier {
 
   // y un getter que devuelva la cantidad de productos en la cart
   int get itemCount {
-    return _items.length;
+    var quantity = 0;
+    _items.forEach((key, cartItem) {
+      quantity += cartItem.quantity;
+    });
+    return quantity;
+  }
+
+  //método para eliminar un item de la cart
+  void removeItem(String productId) {
+    // .remove() es un método de Map al cual le pasamos la key y elimina el item asociado a esa key.
+    _items.remove(productId);
+    notifyListeners();
+  }
+
+  void clear() {
+    _items = {};
+    notifyListeners();
+  }
+
+  //getter para calcular el coste total del cart
+  double get totalAmount {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
   }
 
   // y una función para agregar un cartItem
