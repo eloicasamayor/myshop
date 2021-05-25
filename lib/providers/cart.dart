@@ -45,6 +45,31 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
+  //método para remover un solo elemento (restar candidad -1 )
+  void removeSingleItem(String productId) {
+    //primero comprobamos que este producto esté en el map. Si no está, no hace nada
+    if (!_items.containsKey(productId)) {
+      return;
+    }
+    // si la cantidad es mayor que 1, actualizamos la cantidad restándole 1
+    if (_items[productId].quantity > 1) {
+      _items.update(
+        productId,
+        (existingCartItem) => CartItem(
+          id: existingCartItem.id,
+          title: existingCartItem.title,
+          quantity: existingCartItem.quantity - 1,
+          price: existingCartItem.price,
+        ),
+      );
+    }
+    // si la cantidad es 0, borramos ese item del mapa.
+    else {
+      _items.remove(productId);
+    }
+    notifyListeners();
+  }
+
   //getter para calcular el coste total del cart
   double get totalAmount {
     var total = 0.0;
