@@ -44,6 +44,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _saveForm() {
+    //.validate() retornará true si no hay ningún error, y falso si hay alguno.
+    final _isValid = _form.currentState.validate();
+    if (!_isValid) {
+      return;
+    }
     // podemos acceder al estado del form a través de la globalkey que hemos creado y asociado al form
     _form.currentState.save();
     // .save() llamará el método onSaved en cada formField que hará lo que le digamos
@@ -82,6 +87,19 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     imageUrl: _editedProduct.imageUrl,
                   );
                 },
+                // argumento validator -> definimos una función que valida el valor del input ( el cual lo pasamos como parámetro a la función)
+                // si retorna null, significa que no hay ningún error
+                // si retorna un string, este será el mensaje de error, el que queremos mostrar al usuario.
+                // esta función se puede llamar:
+                // -> Con el argumento auto validate en el widget Form, se lanzará en cada tecla que se presione en el input
+                // -> Podemos llamar a todas las funciones de validación del Form mediante la globalkey: _form.currentState.validate()
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please provide a value';
+                  }
+
+                  return null;
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Price'),
@@ -95,6 +113,19 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     price: double.parse(value),
                     imageUrl: _editedProduct.imageUrl,
                   );
+                },
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please provide a price';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if ((double.parse(value) <= 0) ||
+                      (double.parse(value) >= 1000)) {
+                    return 'Please provide a value between 0 and 10000';
+                  }
+                  return null;
                 },
               ),
               TextFormField(
@@ -110,6 +141,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     price: _editedProduct.price,
                     imageUrl: _editedProduct.imageUrl,
                   );
+                },
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please provide a value';
+                  }
+                  if (value.length < 10) {
+                    return 'Please provide a longer description (10 characters)';
+                  }
+                  return null;
                 },
               ),
               Row(
@@ -154,6 +194,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           price: _editedProduct.price,
                           imageUrl: value,
                         );
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please provide a value';
+                        }
+                        if (!value.startsWith('http')) {
+                          return 'Please provide a valid image URL';
+                        }
+                        if (!value.endsWith('png') &&
+                            !value.endsWith('jpeg') &&
+                            !value.endsWith('jpg')) {
+                          return 'Please provide a valid image URL';
+                        }
+                        return null;
                       },
                     ),
                   ),
