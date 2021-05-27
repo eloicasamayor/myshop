@@ -32,5 +32,9 @@ A few resources to get you started if this is your first Flutter project:
 - --- Saving the data
 - --- Using the same form for creating and editing a product
 
+#### HTTP Requests (http package)
+- Creating a simple firebase realtime database
+- Using the .post() method with .then() and using the response.body to use the generated id 
+
 
 

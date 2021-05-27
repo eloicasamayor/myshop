@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-
+// importamos la librería http con un prefijo para evitar posibles nombres de clases duplicados
+import 'package:http/http.dart' as http;
+//librería de dart para convertir tipos de datos.
+import 'dart:convert';
 import './product.dart';
 
 class Products with ChangeNotifier {
@@ -61,15 +64,36 @@ class Products with ChangeNotifier {
   // y en ellos nos ocupamos de avisar a los Listeners mediante el notifyListeners()
 
   void addProduct(Product product) {
-    final newProduct = Product(
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      id: DateTime.now().toString(),
-    );
-    _items.add(newProduct);
-    notifyListeners();
+    // código asíncrono (asynchronous, "async") -> significa que ejecuta una lógica mientras otro código continua ejecutándose
+    const url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json';
+    http
+        .post(
+      Uri.parse(url),
+      body: json.encode(
+        {
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+          'isFavorite': product.isFavorite,
+        },
+      ),
+    )
+        // el método post() retorna un Future con la respuesta del servidor.
+        // lo cual significa que podemos usar el método .then() después de él, y éste se ejecutará cuando el servidor nos devuelva la respuesta.
+        .then((response) {
+      print(json.decode(response.body));
+      final newProduct = Product(
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        id: DateTime.now().toString(),
+      );
+      _items.add(newProduct);
+      notifyListeners();
+    });
   }
 
   void updateProduct(String id, Product newProduct) {
