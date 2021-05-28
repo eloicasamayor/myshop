@@ -30,6 +30,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     'imageUrl': '',
   };
   var _isinit = true;
+  var _isLoading = false;
 
   @override
   void initState() {
@@ -85,6 +86,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!_isValid) {
       return;
     }
+    setState(() {
+      _isLoading = true;
+    });
+
     // podemos acceder al estado del form a través de la globalkey que hemos creado y asociado al form
     _form.currentState.save();
     // .save() llamará el método onSaved en cada formField que hará lo que le digamos
@@ -98,11 +103,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
         _editedProduct.id,
         _editedProduct,
       );
+      Navigator.of(context).pop();
+      setState(() {
+        _isLoading = false;
+      });
     } else {
       //add
-      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct)
+          // aunque el Future retorna void, tenemos que aceptar un argumento en el .then(). usamos _
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop();
+      });
     }
-    Navigator.of(context).pop();
   }
 
   @override
@@ -113,140 +128,88 @@ class _EditProductScreenState extends State<EditProductScreen> {
         actions: [IconButton(icon: Icon(Icons.save), onPressed: _saveForm)],
       ),
       // el widget Form() es invisible pero aporta muchas funcionalidades para manejar formularios
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Form(
-          key: _form,
-          child: SingleChildScrollView(
-            child: Column(children: [
-              TextFormField(
-                //valor inicial que debe tener. si es producto nuevo estará vacío, si editamos tendrá un valor
-                initialValue: _initValues['title'],
-                decoration: InputDecoration(labelText: 'Title'),
-                textInputAction: TextInputAction.next,
-                onSaved: (value) {
-                  // tenemos que crear una nueva instancia del product ya que todas las propiedades son finals
-                  // con lo cual no podemos reasignar una propiedad una vez ya se ha creado
-                  // pero podemos crear una nueva instancia de product y sobreescribir el valor de _editedProduct
-                  _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: value,
-                    description: _editedProduct.description,
-                    price: _editedProduct.price,
-                    imageUrl: _editedProduct.imageUrl,
-                    isFavorite: _editedProduct.isFavorite,
-                  );
-                },
-                // argumento validator -> definimos una función que valida el valor del input ( el cual lo pasamos como parámetro a la función)
-                // si retorna null, significa que no hay ningún error
-                // si retorna un string, este será el mensaje de error, el que queremos mostrar al usuario.
-                // esta función se puede llamar:
-                // -> Con el argumento auto validate en el widget Form, se lanzará en cada tecla que se presione en el input
-                // -> Podemos llamar a todas las funciones de validación del Form mediante la globalkey: _form.currentState.validate()
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please provide a value';
-                  }
-
-                  return null;
-                },
-              ),
-              TextFormField(
-                initialValue: _initValues['price'],
-                decoration: InputDecoration(labelText: 'Price'),
-                textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.number,
-                onSaved: (value) {
-                  _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: _editedProduct.title,
-                    description: _editedProduct.description,
-                    price: double.parse(value),
-                    imageUrl: _editedProduct.imageUrl,
-                    isFavorite: _editedProduct.isFavorite,
-                  );
-                },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please provide a price';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  if ((double.parse(value) <= 0) ||
-                      (double.parse(value) >= 1000)) {
-                    return 'Please provide a value between 0 and 10000';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                initialValue: _initValues['description'],
-                decoration: InputDecoration(labelText: 'Description'),
-                maxLines: 3,
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.next,
-                onSaved: (value) {
-                  _editedProduct = Product(
-                    id: _editedProduct.id,
-                    title: _editedProduct.title,
-                    description: value,
-                    price: _editedProduct.price,
-                    imageUrl: _editedProduct.imageUrl,
-                    isFavorite: _editedProduct.isFavorite,
-                  );
-                },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please provide a value';
-                  }
-                  if (value.length < 10) {
-                    return 'Please provide a longer description (10 characters)';
-                  }
-                  return null;
-                },
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    margin: EdgeInsets.only(
-                      top: 8,
-                      right: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.grey),
-                    ),
-                    child: _imageUrlController.text.isEmpty
-                        ? Text('Enter a URL')
-                        : FittedBox(
-                            child: Image.network(
-                              _imageUrlController.text,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      decoration: InputDecoration(labelText: 'Image URL'),
-                      keyboardType: TextInputType.url,
-                      textInputAction: TextInputAction.done,
-                      // cuando trabajamos con Form() no hace falta crear los controllers para cada input
-                      // pero en este caso nos interesa para previsualizar la imagen antes del submit.
-                      controller: _imageUrlController,
-                      focusNode: _imageUrlFocusNode,
-                      onFieldSubmitted: (_) {
-                        _saveForm();
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: EdgeInsets.all(16),
+              child: Form(
+                key: _form,
+                child: SingleChildScrollView(
+                  child: Column(children: [
+                    TextFormField(
+                      //valor inicial que debe tener. si es producto nuevo estará vacío, si editamos tendrá un valor
+                      initialValue: _initValues['title'],
+                      decoration: InputDecoration(labelText: 'Title'),
+                      textInputAction: TextInputAction.next,
+                      onSaved: (value) {
+                        // tenemos que crear una nueva instancia del product ya que todas las propiedades son finals
+                        // con lo cual no podemos reasignar una propiedad una vez ya se ha creado
+                        // pero podemos crear una nueva instancia de product y sobreescribir el valor de _editedProduct
+                        _editedProduct = Product(
+                          id: _editedProduct.id,
+                          title: value,
+                          description: _editedProduct.description,
+                          price: _editedProduct.price,
+                          imageUrl: _editedProduct.imageUrl,
+                          isFavorite: _editedProduct.isFavorite,
+                        );
                       },
+                      // argumento validator -> definimos una función que valida el valor del input ( el cual lo pasamos como parámetro a la función)
+                      // si retorna null, significa que no hay ningún error
+                      // si retorna un string, este será el mensaje de error, el que queremos mostrar al usuario.
+                      // esta función se puede llamar:
+                      // -> Con el argumento auto validate en el widget Form, se lanzará en cada tecla que se presione en el input
+                      // -> Podemos llamar a todas las funciones de validación del Form mediante la globalkey: _form.currentState.validate()
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please provide a value';
+                        }
+
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      initialValue: _initValues['price'],
+                      decoration: InputDecoration(labelText: 'Price'),
+                      textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.number,
                       onSaved: (value) {
                         _editedProduct = Product(
                           id: _editedProduct.id,
                           title: _editedProduct.title,
                           description: _editedProduct.description,
+                          price: double.parse(value),
+                          imageUrl: _editedProduct.imageUrl,
+                          isFavorite: _editedProduct.isFavorite,
+                        );
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please provide a price';
+                        }
+                        if (double.tryParse(value) == null) {
+                          return 'Please enter a valid number';
+                        }
+                        if ((double.parse(value) <= 0) ||
+                            (double.parse(value) >= 1000)) {
+                          return 'Please provide a value between 0 and 10000';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      initialValue: _initValues['description'],
+                      decoration: InputDecoration(labelText: 'Description'),
+                      maxLines: 3,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.next,
+                      onSaved: (value) {
+                        _editedProduct = Product(
+                          id: _editedProduct.id,
+                          title: _editedProduct.title,
+                          description: value,
                           price: _editedProduct.price,
-                          imageUrl: value,
+                          imageUrl: _editedProduct.imageUrl,
                           isFavorite: _editedProduct.isFavorite,
                         );
                       },
@@ -254,24 +217,78 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         if (value.isEmpty) {
                           return 'Please provide a value';
                         }
-                        if (!value.startsWith('http')) {
-                          return 'Please provide a valid URL';
-                        }
-                        if (!value.endsWith('png') &&
-                            !value.endsWith('jpeg') &&
-                            !value.endsWith('jpg')) {
-                          return 'Please provide a valid image URL';
+                        if (value.length < 10) {
+                          return 'Please provide a longer description (10 characters)';
                         }
                         return null;
                       },
                     ),
-                  ),
-                ],
-              )
-            ]),
-          ),
-        ),
-      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 100,
+                          margin: EdgeInsets.only(
+                            top: 8,
+                            right: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1, color: Colors.grey),
+                          ),
+                          child: _imageUrlController.text.isEmpty
+                              ? Text('Enter a URL')
+                              : FittedBox(
+                                  child: Image.network(
+                                    _imageUrlController.text,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            decoration: InputDecoration(labelText: 'Image URL'),
+                            keyboardType: TextInputType.url,
+                            textInputAction: TextInputAction.done,
+                            // cuando trabajamos con Form() no hace falta crear los controllers para cada input
+                            // pero en este caso nos interesa para previsualizar la imagen antes del submit.
+                            controller: _imageUrlController,
+                            focusNode: _imageUrlFocusNode,
+                            onFieldSubmitted: (_) {
+                              _saveForm();
+                            },
+                            onSaved: (value) {
+                              _editedProduct = Product(
+                                id: _editedProduct.id,
+                                title: _editedProduct.title,
+                                description: _editedProduct.description,
+                                price: _editedProduct.price,
+                                imageUrl: value,
+                                isFavorite: _editedProduct.isFavorite,
+                              );
+                            },
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Please provide a value';
+                              }
+                              if (!value.startsWith('http')) {
+                                return 'Please provide a valid URL';
+                              }
+                              if (!value.endsWith('png') &&
+                                  !value.endsWith('jpeg') &&
+                                  !value.endsWith('jpg')) {
+                                return 'Please provide a valid image URL';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                  ]),
+                ),
+              ),
+            ),
     );
   }
 }

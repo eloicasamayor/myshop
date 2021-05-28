@@ -63,11 +63,15 @@ class Products with ChangeNotifier {
   //nos aseguramos que sólo se modificará a través de estos métodos,
   // y en ellos nos ocupamos de avisar a los Listeners mediante el notifyListeners()
 
-  void addProduct(Product product) {
+  // queremos que retorne un Future cuando termine de añadir el producto, pero no queremos que retorne nada en el then
+  // por eso definimos el future así: Future<void>
+  Future<void> addProduct(Product product) {
     // código asíncrono (asynchronous, "async") -> significa que ejecuta una lógica mientras otro código continua ejecutándose
     const url =
         'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json';
-    http
+    // el método http.post retorna un Future, y el .then() que usamos después retorna otro future.
+    // por eso, con el return http.post(......) retornará la respuesta cuando termine del último .then
+    return http
         .post(
       Uri.parse(url),
       body: json.encode(
@@ -80,16 +84,22 @@ class Products with ChangeNotifier {
         },
       ),
     )
+        // Código Asíncrono "ASYNC"-> poder ejecutar funciones mientras se ejecutan otras órdenes que pueden tardar mas o que no sabemos cuánto tardarán.
         // el método post() retorna un Future con la respuesta del servidor.
+        // los Future en general, pueden no devolver nada. En ese caso, igualmente hay que aceptar un argumento en el then, aunque luego no lo usamos
+        // cualquier .then() retorna un Future, con lo cual podemos encadenar .then().then... y se ejecutarán por orden, a medida que los vaya ejecutando
         // lo cual significa que podemos usar el método .then() después de él, y éste se ejecutará cuando el servidor nos devuelva la respuesta.
         .then((response) {
       print(json.decode(response.body));
+      // firebase nos devuelve la response, la cual, el body es un map { name: id }
+      // es muy recomendado usar la misma id para la información local y la bbdd para el flujo de información
+      // normalmente se usa la id generada por el backend porque es mas fácil de generar ahí
       final newProduct = Product(
         title: product.title,
         description: product.description,
         price: product.price,
         imageUrl: product.imageUrl,
-        id: DateTime.now().toString(),
+        id: json.decode(response.body)['name'],
       );
       _items.add(newProduct);
       notifyListeners();
