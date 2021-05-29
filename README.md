@@ -33,13 +33,13 @@ This project was made following the 5th and 6th lection in the Flutter Course in
 #### HTTP Requests
 - Creating a simple firebase realtime database
 - **Async code**: one logic executes while other function is still running. Its convenient when we don't know how much time it will take or if it posibly result in an error. There are two ways of managing it on Flutter: Future + .then() + .catchError() or async + wait
-<br> 
 <br> http.post() method returns a Future with the server response.
-<br> Future in general, can return nothing. In that case, anyway we should accept an argument in the then() method, even if we don't use it
+<br> Future in general, can return nothing. In that case,  we should accept an argument in the then() method anyway, even if we don't use it.
 <br> All .then() returns a Future, so we can chain .then().then().then()... and they will run in order, as soon as they finish. So we can use .then() after http.post(). This will run when the server responds and we can handle that response on it. 
 <br>In this case firebase returns as a response as a map with the random id { name: id }. We take it to save it in local memory as well.
 <br>.catchError will run if there is an error in http.post() or in .then(). If there were an error in http.post(), it will no run the .then() so it will go directly to the .catchError()
 <br>we can handle here the error, and we can throw it again with the "throw" key. Then, the place where we called addProduct(), who is waiting for the response of the Future, will receive the error with the  .catchError() (it would also catch the error if we wouldn't do the .catchError here). So, the error is only catched with the first .catchError in line.
+<br>HTTP Request example using Future<>, .then() and .catchError()
 
 ```dart
 Future<void> addProduct(Product product) {
@@ -63,6 +63,33 @@ Future<void> addProduct(Product product) {
     });
   }
 ```
+<br>HTTP Request example using async & await and try{}catch{}
+
+```dart
+  Future<void> addProduct(Product product) async {
+    const url ='https://url.firebasedatabase.app/products.';
+    // con la key "await" le decimos a Dart que tiene que 'esperarse' a que termine. podemos usar "await" porque estamos dentro de una funcion o método async
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: json.encode(
+           {'map defining the product'},
+        ),
+      );
+      final newProduct = Product(
+        'product body',
+        id: json.decode(response.body)['name'],
+      );
+      _items.add(newProduct);
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+```
+<br>With the try-catch, it will try to run the code inside "try", and if it fails, the "catch" will be executed. The code inside "finally" should execute no matters there was an error or not.
+<br>The async method or function returns a Future.
 
 
 

@@ -80,7 +80,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.dispose();
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     //.validate() retornará true si no hay ningún error, y falso si hay alguno.
     final _isValid = _form.currentState.validate();
     if (!_isValid) {
@@ -109,11 +109,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
       });
     } else {
       //add
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) {
-        print('ha llegado aqui');
-        return showDialog<Null>(
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog<Null>(
           context: context,
           builder: (ctx) => AlertDialog(
             title: Text('An error occurred!'),
@@ -128,15 +128,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-      })
-          //showDialog() tambien retorna un Future, con lo cual, si hacemos return showDialog, el siguiente .then() se ejecuta cuando el usuario conteste el diálogo.
-          // aunque el Future retorna void, tenemos que aceptar un argumento en el .then(). usamos _
-          .then((_) {
+      } finally {
         setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop();
-      });
+      }
     }
   }
 

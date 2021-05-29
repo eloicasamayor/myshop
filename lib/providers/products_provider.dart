@@ -65,35 +65,24 @@ class Products with ChangeNotifier {
 
   // queremos que retorne un Future cuando termine de añadir el producto, pero no queremos que retorne nada en el then
   // por eso definimos el future así: Future<void>
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     // código asíncrono (asynchronous, "async") -> significa que ejecuta una lógica mientras otro código continua ejecutándose
     const url =
         'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json';
-    // el método http.post retorna un Future, y el .then() que usamos después retorna otro future.
-    // por eso, con el return http.post(......) retornará la respuesta cuando termine del último .then
-    return http
-        .post(
-      Uri.parse(url),
-      body: json.encode(
-        {
-          'title': product.title,
-          'description': product.description,
-          'imageUrl': product.imageUrl,
-          'price': product.price,
-          'isFavorite': product.isFavorite,
-        },
-      ),
-    )
-        // Código Asíncrono "ASYNC"-> poder ejecutar funciones mientras se ejecutan otras órdenes que pueden tardar mas o que no sabemos cuánto tardarán.
-        // el método post() retorna un Future con la respuesta del servidor.
-        // los Future en general, pueden no devolver nada. En ese caso, igualmente hay que aceptar un argumento en el then, aunque luego no lo usamos
-        // cualquier .then() retorna un Future, con lo cual podemos encadenar .then().then... y se ejecutarán por orden, a medida que los vaya ejecutando
-        // lo cual significa que podemos usar el método .then() después de él, y éste se ejecutará cuando el servidor nos devuelva la respuesta.
-        .then((response) {
-      print(json.decode(response.body));
-      // firebase nos devuelve la response, la cual, el body es un map { name: id }
-      // es muy recomendado usar la misma id para la información local y la bbdd para el flujo de información
-      // normalmente se usa la id generada por el backend porque es mas fácil de generar ahí
+    // con la key "await" le decimos a Dart que tiene que 'esperarse' a que termine. podemos usar "await" porque estamos dentro de una funcion o método async
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: json.encode(
+          {
+            'title': product.title,
+            'description': product.description,
+            'imageUrl': product.imageUrl,
+            'price': product.price,
+            'isFavorite': product.isFavorite,
+          },
+        ),
+      );
       final newProduct = Product(
         title: product.title,
         description: product.description,
@@ -103,16 +92,10 @@ class Products with ChangeNotifier {
       );
       _items.add(newProduct);
       notifyListeners();
-    })
-        // el .catchError se ejecutará si hubo algún error ya sea en el http.post() o en el .then()
-        // si hubiera un error en http.post(), no se ejecutaría el .then() e iría directamente al .catchError()
-        .catchError((error) {
+    } catch (error) {
       print(error);
-      // podemos gestionar qué hacer con el error, y tamien podemos crearlo de nuevo, con throw + el error
-      // entonces, el lugar donde llamamos al addProduct(), que está esperando la respuesta de este Future, captará el error con un .catchError()
-      // también lo captaría con .catchError si no hiciéramos catchError aquí.
       throw error;
-    });
+    }
   }
 
   void updateProduct(String id, Product newProduct) {
