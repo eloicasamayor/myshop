@@ -37,7 +37,8 @@ A few resources to get you started if this is your first Flutter project:
 - Using the .post() method with .then() and using the response.body to use the generated id 
 - Async code: one logic executes while other function is still running. Its convenient when we don't know how much time it will take or if it posibly result in an error. There are two ways of managing it on Flutter: Future + .then() + .catchError() or async + wait
 <br> 
-```dart
+
+```
 Future<void> addProduct(Product product) {
     const url =
         'https://url.firebasedatabase.app/products.json';
