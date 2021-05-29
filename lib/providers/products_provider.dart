@@ -103,6 +103,15 @@ class Products with ChangeNotifier {
       );
       _items.add(newProduct);
       notifyListeners();
+    })
+        // el .catchError se ejecutará si hubo algún error ya sea en el http.post() o en el .then()
+        // si hubiera un error en http.post(), no se ejecutaría el .then() e iría directamente al .catchError()
+        .catchError((error) {
+      print(error);
+      // podemos gestionar qué hacer con el error, y tamien podemos crearlo de nuevo, con throw + el error
+      // entonces, el lugar donde llamamos al addProduct(), que está esperando la respuesta de este Future, captará el error con un .catchError()
+      // también lo captaría con .catchError si no hiciéramos catchError aquí.
+      throw error;
     });
   }
 

@@ -109,7 +109,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
       });
     } else {
       //add
-      Provider.of<Products>(context, listen: false).addProduct(_editedProduct)
+      Provider.of<Products>(context, listen: false)
+          .addProduct(_editedProduct)
+          .catchError((error) {
+        print('ha llegado aqui');
+        return showDialog<Null>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('An error occurred!'),
+            content: Text('Something went wrong.'),
+            actions: [
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ),
+        );
+      })
+          //showDialog() tambien retorna un Future, con lo cual, si hacemos return showDialog, el siguiente .then() se ejecuta cuando el usuario conteste el diálogo.
           // aunque el Future retorna void, tenemos que aceptar un argumento en el .then(). usamos _
           .then((_) {
         setState(() {
