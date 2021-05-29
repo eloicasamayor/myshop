@@ -37,41 +37,31 @@ A few resources to get you started if this is your first Flutter project:
 - Using the .post() method with .then() and using the response.body to use the generated id 
 - Async code: one logic executes while other function is still running. Its convenient when we don't know how much time it will take or if it posibly result in an error. There are two ways of managing it on Flutter: Future + .then() + .catchError() or async + wait
 <br> 
+<br> http.post() method returns a Future with the server response.
+<br> Future in general, can return nothing. In that case, anyway we should accept an argument in the then() method, even if we don't use it
+<br> All .then() returns a Future, so we can chain .then().then().then()... and they will run in order, as soon as they finish. So we can use .then() after http.post(). This will run when the server responds and we can handle that response on it. 
+<br>In this case firebase returns as a response as a map with the random id { name: id }. We take it to save it in local memory as well.
+<br>.catchError will run if there is an error in http.post() or in .then(). If there were an error in http.post(), it will no run the .then() so it will go directly to the .catchError()
+<br>we can handle here the error, and we can throw it again with the "throw" key. Then, the place where we called addProduct(), who is waiting for the response of the Future, will receive the error with the  .catchError() (it would also catch the error if we wouldn't do the .catchError here). So, the error is only catched with the first .catchError in line.
 
-```
+```dart
 Future<void> addProduct(Product product) {
-    const url =
-        'https://url.firebasedatabase.app/products.json';
-    return http
-        .post(
+    const url ='https://url.firebasedatabase.app/products.json';
+    return http.post(
       Uri.parse(url),
       body: json.encode(
-        {
-          'map defining the product'
-        },
+        {'map defining the product'},
       ),
-    )
-        // post() method returns a Future with the server response.
-        // Future in general, can return nothing. In that case, anyway we should accept an argument in the then() method, even if we don't use it
-        // all .then() returns a Future, so we can chain .then().then().then()... and they will run in order, as soon as they finish
-        // so we can use .then() after http.post(). This will run when the server responds and we can handle that response on it. 
-        .then((response) {
+    ).then((response) {
       print(json.decode(response.body));
-      // in this case firebase returns as a response as a map with the random id { name: id }. We take it to save it in local memory as well.
       final newProduct = Product(
         'product body',
         id: json.decode(response.body)['name'],
       );
       _items.add(newProduct);
       notifyListeners();
-    })
-        // .catchError will run if there is an error in http.post() or in .then()
-        // i there were an error in http.post(), it will no run the .then() so it will go directly to the .catchError()
-        .catchError((error) {
+    }).catchError((error) {
       print(error);
-      // we can handle here the error, and we can throw it again with the "throw" key
-      // then, the place where we called addProduct(), who is waiting for the response of the Future, will receive the error with the  .catchError()
-      // (it would also catch the error if we wouldn't do the .catchError here). So, the error is only catched with the first .catchError in line.
       throw error;
     });
   }
