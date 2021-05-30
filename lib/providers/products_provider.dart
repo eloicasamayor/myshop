@@ -9,7 +9,7 @@ class Products with ChangeNotifier {
   //nombramos la variable con la _ para dejar claro que no debe ser accesible desde fuera de la clase.
   //no es final porque cambiará con el tiempo.
   List<Product> _items = [
-    Product(
+    /*Product(
       id: 'p1',
       title: 'Red Shirt',
       description: 'A red shirt - it is pretty red!',
@@ -40,7 +40,7 @@ class Products with ChangeNotifier {
       price: 49.99,
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
+    ),*/
   ];
 
   // un getter público (sin la _) el cual retorna una copia de _items.
@@ -62,6 +62,33 @@ class Products with ChangeNotifier {
 
   //nos aseguramos que sólo se modificará a través de estos métodos,
   // y en ellos nos ocupamos de avisar a los Listeners mediante el notifyListeners()
+
+  Future<void> fetchAndSetProduct() async {
+    const url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json';
+    // como estamos dentro de "async", podemos usar "await" para esperar por la respuesta
+    // almacenamos la respuesta en una variable porque la respuesta contendrá los datos
+    try {
+      final response = await http.get(Uri.parse(url));
+      // sabemos que el map contiene un map para cada string, pero Flutter daría error si lo ponemos. hay que poner "dynamic"
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadedProducts = [];
+      extractedData.forEach((prodId, prodData) {
+        loadedProducts.add(Product(
+          id: prodId,
+          title: prodData['title'],
+          description: prodData['description'],
+          price: prodData['price'],
+          isFavorite: prodData['isFavorite'],
+          imageUrl: prodData['imageUrl'],
+        ));
+      });
+      _items = loadedProducts;
+      notifyListeners();
+    } catch (error) {
+      print(error);
+    }
+  }
 
   // queremos que retorne un Future cuando termine de añadir el producto, pero no queremos que retorne nada en el then
   // por eso definimos el future así: Future<void>

@@ -91,5 +91,26 @@ Future<void> addProduct(Product product) {
 <br>With the try-catch, it will try to run the code inside "try", and if it fails, the "catch" will be executed. The code inside "finally" should execute no matters there was an error or not.
 <br>The async method or function returns a Future.
 
-
+- We cannot use .of(context) inside the initState() method. That's because here the widget is not fully loaded yet. There are 3 posible workarrounds:
+- A) when using Provider.of<class>(context), it will work when we don't want to listen, like this: 
+```dart
+Provider.of<ClassOfTheProvider>(context, listen: false)
+```
+- B) Create a Future (with the helper constructor Future.delayed()) with zero duration and inside it use the Provider.of(context)
+```dart
+Future.delayed(Duration.zero).then(_){
+  Provider.of<ClassOfTheProvider>(context).methodWeWantToCall()
+}
+```
+- C) Use it inside didChangeDependencies(). This method runs multiple times, that's why we have to work with a flag variable when using this approach:
+```dart
+var _isInit = true;
+@override
+void didChangeDependencies() {
+  if(_isInit){
+    Provider.of<ClassOfTheProvider>(context).methodWeWantToCall()
+  }
+  _isInit = false;
+}
+```
 
