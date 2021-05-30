@@ -1,13 +1,8 @@
-# myshop
+# myshop flutter app: learning to build flutter apps
+Shopping app made with Flutter. This was done following a great [Flutter course in Udemy] (https://www.udemy.com/course/learn-flutter-dart-to-build-ios-android-apps/)
+Here I have been writing down the concepts learned in the course.
 
-Shopping app made with Flutter.
-
-## Following the course
-
-This project was made following the 5th and 6th lection in the Flutter Course in Udemy
-
-### What I've learned
-#### State Management
+## State Management
 - **Inheritance** ("extens") and **Mixins** ("with")
 - State Management: using the provider package
 <br> - Building the providers using the within ChangeNotifier and getters to get the data. Using the notifyListeners() functions to alert listeners at any change in the data.
@@ -22,7 +17,7 @@ This project was made following the 5th and 6th lection in the Flutter Course in
 <br>
 <br>
 
-#### User inputs and Forms
+## User inputs and Forms
 - Using the **Snackbar** widget and adding the opction to UNDO.
 - Using the **Alert** widget and do something depending on the user response.
 - Using **Forms** 
@@ -30,7 +25,7 @@ This project was made following the 5th and 6th lection in the Flutter Course in
 - --- Saving the data
 - --- Using the same form for creating and editing a product
 
-#### HTTP Requests and error handling
+## HTTP Requests and error handling
 
 **Async code**: one logic executes while other function is still running. Its convenient when we don't know how much time it will take or if it posibly result in an error. There are two ways of managing it on Flutter: Future + .then() + .catchError() or async + wait
 -  http.post() method returns a Future with the server response.
@@ -91,7 +86,7 @@ Future<void> addProduct(Product product) {
 <br>With the try-catch, it will try to run the code inside "try", and if it fails, the "catch" will be executed. The code inside "finally" should execute no matters there was an error or not.
 <br>The async method or function returns a Future.
 
-##### We cannot use initState in some cases
+### We cannot use initState in some cases
 - **We cannot use .of(context) inside the initState() method**. That's because here the widget is not fully loaded yet. There are 3 posible workarrounds:
 <br> A) when using Provider.of<class>(context), it will work when we don't want to listen, like this: 
 ```dart
