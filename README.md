@@ -139,7 +139,7 @@ void didChangeDependencies() {
 - **RefreshIndicator**: widget to implement te tipical pattern of "pull to refresh". It takes a child (with the singleChildScrollView or whatever) and a pointer to a function (that should return a Future)
 
 ### HTTP Patch
-- http.patch is a request type supported by firebase that will tell the server to **merge the data which is incoming with the existing data** at that address. It takes two arguments: the url and the body (which will be the new data in json format). It will override the data that exists and will add the data that does not coincide. Normally we would implement it on a Future:
+http.patch is a request type supported by firebase that will tell the server to **merge the data which is incoming with the existing data** at that address. It takes two arguments: the url and the body (which will be the new data in json format). It will override the data that exists and will add the data that does not coincide. Normally we would implement it on a Future:
 
 ```dart
   Future<void> updateProduct(String id, Product newProduct) async {
@@ -168,7 +168,7 @@ void didChangeDependencies() {
   }
 ```
 ### HTTP Delete
-- http.delete is a request type supported by firebase that will tell the server to **delete the data at that address**. We can do the operation in a Future or using the **optimistic updating** method. It consists on saving the old data in memory (in a variable), then try to update the db with the new values and finally to go back to the old data, saved in memory, in case it fails to update the db.
+http.delete is a request type supported by firebase that will tell the server to **delete the data at that address**. We can do the operation in a Future or using the **optimistic updating** method. It consists on saving the old data in memory (in a variable), then try to update the db with the new values and finally to go back to the old data, saved in memory, in case it fails to update the db.
 
 ```dart
 void deleteProduct(String id) {
@@ -188,8 +188,8 @@ void deleteProduct(String id) {
 When we use the "implements" keyname followed by a ClassName, in the declaration of a class, we are signing a contract: **we compromise to implement all functions this class has**. In Dart, every class invisibly extends Object, **every class is an object**, and that's why every class has the method .toString()
 
 ### Managing errors in http requests
-- The HTTP package only throws its own errors for GET and POST requests if the server returns an error status code.
-- For PATCH, PUT, DELETE, it doesn't throw error for error responses from server. So in theese cases a simple try-catch is not enought, we have to get the server response and compare the status code.
+The HTTP package only throws its own errors for GET and POST requests if the server returns an error status code.
+<br>For PATCH, PUT, DELETE, **it doesn't throw error** for error responses from server. So in theese cases a simple try-catch is not enought, we have to get the server response and compare the status code.
 
 ```dart
 final response = await http.patch(
@@ -201,7 +201,7 @@ final response = await http.patch(
       }
 ```
 ### FutureBuilder widget
-- It takes a Future and allow us to build different content depending on the temporal state of that Future. It takes two arguments:
+It takes a Future and allow us to build different content depending on the temporal state of that Future. It takes two arguments:
 - The future, a Future function the widget will take into account.
 - The builder, an annonymous function that takes the context and a dataSnapshot of the Future (an object that contains the info of the state of the Future.) In this anonymous function we can access the dataSnapshot data and build widgets depending on that.
 
