@@ -1,10 +1,29 @@
 # myshop flutter app: learning to build flutter apps
-Shopping app made with Flutter. This was done following a great [Flutter course in Udemy] (https://www.udemy.com/course/learn-flutter-dart-to-build-ios-android-apps/)
+Shopping app made with Flutter. This was done following a great [Flutter course in Udemy](https://www.udemy.com/course/learn-flutter-dart-to-build-ios-android-apps/)
 Here I have been writing down the concepts learned in the course.
 
-## State Management
-- **Inheritance** ("extens") and **Mixins** ("with")
-- State Management: using the provider package
+## Inheritance
+When we use the key "extends" in the class definition, followed by the name of another class we are saying that this new class inherits all properties and methods of the father class. A class can extend maximum from another class. We can override methods and properties, indicating it with the decorator "@override".
+```dart
+  class Mamifero {
+    void respirar() {
+      print ('Inhala... exhala...');
+    }
+  }
+  class Person extends Mamifero {
+    String name;
+    int age;
+
+    Person(this.name, this.age);
+  }
+```
+> In this case, every instance of Person will be of type Person and also of type Mamifero.
+  
+
+## Mixins
+We define a mixin with the key mixin. And we can use this mixin with the key "with" followed by the mixin name in a class definition. When using a mixin, that class will have the methods and properties of the mixin. It is a lot like inheritance, but with mixins the intances of the class are not of mixin' type. It must be used when the connection with the elements is not that strong. We can use multiple mixins at the same time. 
+
+## State Management: using the provider package
 <br> - Building the providers using the within ChangeNotifier and getters to get the data. Using the notifyListeners() functions to alert listeners at any change in the data.
 <br> - Stablishing the Provider in the highest widget in the widget tree where we will need that data using the ChangeNotifierProvider() or ChangeNotifierProvider.value() and referencing the Class.
 <br> - On Children of the Provider widget we can listen the provider in two ways:
@@ -120,7 +139,7 @@ void didChangeDependencies() {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
       final url =
-          'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+          'https://url.firebasedatabase.app/products/$id.json';
       try {
         await http.patch(
           Uri.parse(url),
@@ -147,7 +166,7 @@ void didChangeDependencies() {
 ```dart
 void deleteProduct(String id) {
     final url =
-        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+        'https://url.firebasedatabase.app/products/$id.json';
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];    _items.removeAt(existingProductIndex);    http.delete(Uri.parse(url)).then((_) {
       existingProduct = null;
@@ -163,7 +182,7 @@ void deleteProduct(String id) {
 
 ### Managing errors in http requests
 - The HTTP package only throws its own errors for GET and POST requests if the server returns an error status code.
-- For PATCH, PUT, DELETE, it doesn't throw error for error responses from server. So in theese cases a simple try-catch is not enought, we have to manage the server response and compare the reponse code.
+- For PATCH, PUT, DELETE, it doesn't throw error for error responses from server. So in theese cases a simple try-catch is not enought, we have to get the server response and compare the status code.
 
 ```dart
 final response = await http.patch(
