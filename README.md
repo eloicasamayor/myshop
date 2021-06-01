@@ -99,6 +99,7 @@ Future.delayed(Duration.zero).then(_){
 }
 ```
 <br> C) Use it inside didChangeDependencies(). This method runs multiple times, that's why we have to work with a flag variable when using this approach:
+
 ```dart
 var _isInit = true;
 @override
@@ -109,4 +110,67 @@ void didChangeDependencies() {
   _isInit = false;
 }
 ```
+- **RefreshIndicator**: widget to implement te tipical pattern of "pull to refresh". It takes a child (with the singleChildScrollView or whatever) and a pointer to a function (that should return a Future)
 
+### HTTP Patch
+- http.patch is a request type supported by firebase that will tell the server to **merge the data which is incoming with the existing data** at that address. It takes two arguments: the url and the body (which will be the new data in json format). It will override the data that exists and will add the data that does not coincide. Normally we would implement it on a Future:
+
+```dart
+  Future<void> updateProduct(String id, Product newProduct) async {
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    if (prodIndex >= 0) {
+      final url =
+          'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+      try {
+        await http.patch(
+          Uri.parse(url),
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'price': newProduct.price,
+          }),
+        );
+      } catch (error) {
+        print("could not update product");
+      }
+      _items[prodIndex] = newProduct;
+      notifyListeners();
+    } else {
+      print('this product does not exist');
+    }
+  }
+```
+### HTTP Delete
+- http.delete is a request type supported by firebase that will tell the server to** delete the data at that address**. We can do the operation in a Future or using the **optimistic updating** method. It consists on saving the old data in memory (in a variable), then try to update the db with the new values and finally to go back to the old data, saved in memory, in case it fails to update the db.
+
+```dart
+void deleteProduct(String id) {
+    final url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingProduct = _items[existingProductIndex];    _items.removeAt(existingProductIndex);    http.delete(Uri.parse(url)).then((_) {
+      existingProduct = null;
+    }).catchError((error) {
+            _items.insert(existingProductIndex, existingProduct);
+    });
+    notifyListeners();
+  }
+```
+
+### Creating custom Exceptions
+- When we use the "implements" keyname followed by a ClassName, in the declaration of a class, we are signing a contract: **we compromise to implement all functions this class has**. In Dart, every class invisibly extends Object, **every class is an object**, and that's why every class has the method .toString()
+
+### Managing errors in http requests
+- The HTTP package only throws its own errors for GET and POST requests if the server returns an error status code.
+- For PATCH, PUT, DELETE, it doesn't throw error for error responses from server. So in theese cases a simple try-catch is not enought, we have to manage the server response and compare the reponse code.
+
+```dart
+final response = await http.patch(
+        Uri.parse(url),
+        body: json.encode({'isFavorite': isFavorite}),
+      );
+      if (response.statusCode >= 400) {
+        _setFavValue(oldValue);
+      }
+```

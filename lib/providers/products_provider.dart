@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 //librería de dart para convertir tipos de datos.
 import 'dart:convert';
 import './product.dart';
+import '../models/http_exception.dart';
 
 class Products with ChangeNotifier {
   //nombramos la variable con la _ para dejar claro que no debe ser accesible desde fuera de la clase.
@@ -63,7 +64,7 @@ class Products with ChangeNotifier {
   //nos aseguramos que sólo se modificará a través de estos métodos,
   // y en ellos nos ocupamos de avisar a los Listeners mediante el notifyListeners()
 
-  Future<void> fetchAndSetProduct() async {
+  Future<void> fetchAndSetProducts() async {
     const url =
         'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json';
     // como estamos dentro de "async", podemos usar "await" para esperar por la respuesta
@@ -125,19 +126,50 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
-    // para asegurarnos que realmente vamos a actualizar un producto que existe, que está en la lista
     if (prodIndex >= 0) {
+      final url =
+          'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+      try {
+        await http.patch(
+          Uri.parse(url),
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'price': newProduct.price,
+          }),
+        );
+      } catch (error) {
+        print("could not update product");
+      }
       _items[prodIndex] = newProduct;
       notifyListeners();
     } else {
-      print('este producto no existe');
+      print('this product does not exist');
     }
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((prod) => prod.id == id);
+  Future<void> deleteProduct(String id) async {
+    final url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+    // optimistic updating -> esta tecnica de actualizar datos sin usar Future
+    // guardamos el valor antiguo
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingProduct = _items[existingProductIndex];
+
+    // lo eliminamos de la lista en memoria local (pero sigue estando en la variable existingProduct)
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+    // intentamos eliminarlo de la base de datos
+    final response = await http.delete(Uri.parse(url));
+    if (response.statusCode >= 400) {
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException('Could not delete the product.');
+    }
+    existingProduct = null;
+    // si no se ha podido actualizar por un error, volvemos a insertar el dato en la lista en memoria local
   }
 }

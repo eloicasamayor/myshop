@@ -99,14 +99,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     if (_editedProduct.id != null) {
       //update existing product
-      Provider.of<Products>(context, listen: false).updateProduct(
-        _editedProduct.id,
-        _editedProduct,
-      );
-      Navigator.of(context).pop();
-      setState(() {
-        _isLoading = false;
-      });
+      // agregamos el await para que espere a ejecutar las siguientes lineas hasta que retorne la respuesta del
+      try {
+        print("title=" + _editedProduct.title);
+        print("price=" + _editedProduct.price.toString());
+        await Provider.of<Products>(context, listen: false).updateProduct(
+          _editedProduct.id,
+          _editedProduct,
+        );
+      } catch (error) {
+        print(error);
+      }
     } else {
       //add
       try {
@@ -128,13 +131,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop();
       }
     }
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).pop();
   }
 
   @override

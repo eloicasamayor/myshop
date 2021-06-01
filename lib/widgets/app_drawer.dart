@@ -13,7 +13,6 @@ class AppDrawer extends StatelessWidget {
             title: Text('Hello Friend'),
             automaticallyImplyLeading: false,
           ),
-          Divider(),
           ListTile(
             leading: Icon(Icons.shop),
             title: Text('Shop'),
@@ -33,6 +32,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () => Navigator.of(context)
                 .pushReplacementNamed(UserProductsScreen.routeName),
           ),
+          Divider(),
         ],
       ),
     );

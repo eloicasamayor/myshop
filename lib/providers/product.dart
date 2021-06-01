@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 //foundation.dart nos permite usar el decorator @required
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Product with ChangeNotifier {
   final String id;
@@ -20,10 +22,27 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  //método para invertir el valor de isFavorite. Si era true será false, y si era false será true.
-  void toggleFavoriteStatus() {
-    isFavorite = !isFavorite;
-    //avisamos a todos los listeners con el notifyListeners()
+  void _setFavValue(bool newValue) {
+    isFavorite = newValue;
     notifyListeners();
+  }
+
+  Future<void> toggleFavoriteStatus() async {
+    final url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+    var oldValue = isFavorite;
+    isFavorite = !isFavorite;
+    notifyListeners();
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        body: json.encode({'isFavorite': isFavorite}),
+      );
+      if (response.statusCode >= 400) {
+        _setFavValue(oldValue);
+      }
+    } catch (error) {
+      _setFavValue(oldValue);
+    }
   }
 }
