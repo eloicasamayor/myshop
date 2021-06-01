@@ -27,13 +27,15 @@ We define a mixin with the key mixin. And we can use this mixin with the key "wi
 <br> - Building the providers using the within ChangeNotifier and getters to get the data. Using the notifyListeners() functions to alert listeners at any change in the data.
 <br> - Stablishing the Provider in the highest widget in the widget tree where we will need that data using the ChangeNotifierProvider() or ChangeNotifierProvider.value() and referencing the Class.
 <br> - On Children of the Provider widget we can listen the provider in two ways:
-<br>    --- With Provider.of<ClassName>(context). We rebuild the entire widget on every change in the provider data. unless we add the "listen: false" argument.
-<br>    --- With Consumer<ClassName>(builder: (ctx, data, child) => widget), child: child. Here we only rerun wha'ts inside the Consumer widget.
-<br> - Multiple providers.
-<br>
+
+### The Provider.of<T>(context) method
+With Provider.of<ClassName>(context). We rebuild the entire widget on every change in the provider data. unless we add the "listen: false" argument.
+
+### The Consumer() widget 
+With Consumer<ClassName>(builder: (ctx, data, child) => widget), child: child. Here we only rerun wha'ts inside the Consumer widget.
+### Multiple providers.
 - We will use **StatefulWidget** when the state (the data) only affect that widget or maybe his child<br>
 - We will use the **provider package** when the state affects all the app or multiple places around the widget tree.
-<br>
 <br>
 
 ## User inputs and Forms
@@ -44,13 +46,17 @@ We define a mixin with the key mixin. And we can use this mixin with the key "wi
 - --- Saving the data
 - --- Using the same form for creating and editing a product
 
-## HTTP Requests and error handling
+## HTTP Requests
 
-**Async code**: one logic executes while other function is still running. Its convenient when we don't know how much time it will take or if it posibly result in an error. There are two ways of managing it on Flutter: Future + .then() + .catchError() or async + wait
+### Async code in Flutter: the Future class
+
+One logic executes while other function is still running. Its convenient when we don't know how much time it will take or if it posibly result in an error. There are two ways of managing it on Flutter: Future + .then() + .catchError() or async + wait
 -  http.post() method returns a Future with the server response.
 -  Future in general, can return nothing. In that case,  we should accept an argument in the then() method anyway, even if we don't use it.
 -  All .then() returns a Future, so we can chain .then().then().then()... and they will run in order, as soon as they finish. So we can use .then() after http.post(). This will run when the server responds and we can handle that response on it. 
 - In this case firebase returns as a response as a map with the random id { name: id }. We take it to save it in local memory as well.
+
+## Error handling
 - .catchError will run if there is an error in http.post() or in .then(). If there were an error in http.post(), it will no run the .then() so it will go directly to the .catchError()
 - we can handle here the error, and we can throw it again with the "throw" key. Then, the place where we called addProduct(), who is waiting for the response of the Future, will receive the error with the  .catchError() (it would also catch the error if we wouldn't do the .catchError here). So, the error is only catched with the first .catchError in line.
 - HTTP Request example using Future<>, .then() and .catchError()
@@ -108,6 +114,7 @@ Future<void> addProduct(Product product) {
 ### We cannot use initState in some cases
 - **We cannot use .of(context) inside the initState() method**. That's because here the widget is not fully loaded yet. There are 3 posible workarrounds:
 <br> A) when using Provider.of<class>(context), it will work when we don't want to listen, like this: 
+
 ```dart
 Provider.of<ClassOfTheProvider>(context, listen: false)
 ```
@@ -161,7 +168,7 @@ void didChangeDependencies() {
   }
 ```
 ### HTTP Delete
-- http.delete is a request type supported by firebase that will tell the server to** delete the data at that address**. We can do the operation in a Future or using the **optimistic updating** method. It consists on saving the old data in memory (in a variable), then try to update the db with the new values and finally to go back to the old data, saved in memory, in case it fails to update the db.
+- http.delete is a request type supported by firebase that will tell the server to **delete the data at that address**. We can do the operation in a Future or using the **optimistic updating** method. It consists on saving the old data in memory (in a variable), then try to update the db with the new values and finally to go back to the old data, saved in memory, in case it fails to update the db.
 
 ```dart
 void deleteProduct(String id) {
@@ -178,7 +185,7 @@ void deleteProduct(String id) {
 ```
 
 ### Creating custom Exceptions
-- When we use the "implements" keyname followed by a ClassName, in the declaration of a class, we are signing a contract: **we compromise to implement all functions this class has**. In Dart, every class invisibly extends Object, **every class is an object**, and that's why every class has the method .toString()
+When we use the "implements" keyname followed by a ClassName, in the declaration of a class, we are signing a contract: **we compromise to implement all functions this class has**. In Dart, every class invisibly extends Object, **every class is an object**, and that's why every class has the method .toString()
 
 ### Managing errors in http requests
 - The HTTP package only throws its own errors for GET and POST requests if the server returns an error status code.
@@ -192,4 +199,34 @@ final response = await http.patch(
       if (response.statusCode >= 400) {
         _setFavValue(oldValue);
       }
+```
+### FutureBuilder widget
+- It takes a Future and allow us to build different content depending on the temporal state of that Future. It takes two arguments:
+- The future, a Future function the widget will take into account.
+- The builder, an annonymous function that takes the context and a dataSnapshot of the Future (an object that contains the info of the state of the Future.) In this anonymous function we can access the dataSnapshot data and build widgets depending on that.
+
+```dart
+utureBuilder(
+        future: Provider.of<Orders>(context, listen: false).fetchAndSetOrders(),
+        builder: (ctx, dataSnapshot) {
+          if (dataSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            if (dataSnapshot.error != null) {
+              return Center(
+                child: Text('There was an error'),
+              );
+            } else {
+              return Consumer<Orders>(
+                builder: (ctx, orderData, child) => ListView.builder(
+                  itemCount: orderData.orders.length,
+                  itemBuilder: (ctx, i) => OrderItem(orderData.orders[i]),
+                ),
+              );
+            }
+          }
+        },
+      ),
 ```

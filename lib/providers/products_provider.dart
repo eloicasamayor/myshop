@@ -73,6 +73,9 @@ class Products with ChangeNotifier {
       final response = await http.get(Uri.parse(url));
       // sabemos que el map contiene un map para cada string, pero Flutter daría error si lo ponemos. hay que poner "dynamic"
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      if (extractedData == null) {
+        return;
+      }
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
