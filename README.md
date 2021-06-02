@@ -1,6 +1,7 @@
 # myshop flutter app: learning to build flutter apps
 Shopping app made with Flutter. This was done following a great [Flutter course in Udemy](https://www.udemy.com/course/learn-flutter-dart-to-build-ios-android-apps/)
-Here I have been writing down the concepts learned in the course.
+
+Here I have been writing down the concepts I learned in the course.
 
 ## Deployment
 You can see the web app deployed at [GitHub Pages](https://eloicasamayor.github.io/myshop/#/)
@@ -44,10 +45,23 @@ With Consumer<ClassName>(builder: (ctx, data, child) => widget), child: child. H
 ## User inputs and Forms
 - Using the **Snackbar** widget and adding the opction to UNDO.
 - Using the **Alert** widget and do something depending on the user response.
-- Using **Forms** 
-- --- Validation
-- --- Saving the data
-- --- Using the same form for creating and editing a product
+- The **Form()** widget helps us with collecting user input and with validation as well, so we don't have to create a TextEditingController for every input and validate the inputs in custom functions. The Form widget itself is invisible, but inside it we can use special input widgets that can be validated and saved together in a simple way. It takes a child argument where you put the widget tree.
+We have to asign another argument: the key, declared as:
+```dart
+final _form = GlobalKey<FormState>();
+```
+
+- TextFormField() can be used inside a Form and are directly connected to that parent form.
+- **Saving the data**: globalKeyInstance.currentState.save() will trigger every "onSave" method in every TextFormField widget in the form. The function of the onSaved argument gets the value entered on the input.
+```dart
+void _saveForm(){
+  _form.currentState.save();
+}
+```
+- **Validating**: globalKeyInstance.currentState.validate() will trigger every "validator" method in every TextFormField in the form.
+in every TextFormField in the form we can add a "validator:" argument. "validator" takes a function with takes a value (the value entered in the textFormField by the user) and returns something.
+If it return null, it would be as "there is no error". It it returns a text, this text is treated as the error text = the message you want to show to the user.
+
 
 ## HTTP Requests
 
@@ -233,5 +247,24 @@ utureBuilder(
         },
       ),
 ```
+## Spread operator
+Provide a concise way to insert multiple values into a collection.
 
-## GitHub Actions
+```dart
+var list = [1, 2, 3];
+var list2 = [0, ...list];
+assert(list2.length == 4);
+```
+
+## Cascade operator
+Allow you to make a sequence of operations on the same object. In addition to function calls, you can also access fields on that same object. This often saves you the step of creating a temporary variable and allows you to write more fluid code.
+
+```dart
+final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
+transformConfig.translate(-10.0);
+// it is the same as:
+Matrix4.rotationZrotationZ(-8 * pi / 180)..translate(-10.0);
+```
+
+## Authentication
+In flutter we use Tokens to admin the authentication of users. When a user logs in, a token is generated on the server with an algorithm and a private key only known by the server. So the token can't be faked. This token is a long string that is sent to the app and stored on de device. It is stored in the "hard drive", and that allow us to keep the token when the app restarts. In the server it's defined certain endpoints whereas the request must have a token attached, and it won't respond if it is the valid token.
