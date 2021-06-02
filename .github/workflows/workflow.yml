@@ -27,20 +27,8 @@ jobs:
           git config --global user.name eloicasamayor
           git status
           # change this remote url for examle your remote url is https://github.com/onatcipli/flutter_web.git then the following:
-          git remote add origin https://${{secrets.ACCESS_TOKEN}}@github.com/onatcipli/flutter_web.git
+          git remote add origin https://${{secrets.ACCESS_TOKEN}}@github.com/eloicasamayor/myshop.git
           git checkout -b gh-pages
           git add --all
           git commit -m "update"
           git push origin gh-pages -f
-
-
-
-        cd example/build/web
-        git init
-        git config user.name  eloicasamayor
-        git config user.email 37459666+eloicasamayor@users.noreply.github.com
-        git remote add secure-origin https://${{ secrets.ACCESS_TOKEN }}@github.com/eloicasamayor/myshop.git
-        git checkout -b gh-pages
-        git add .
-        git commit -m "Updated docs"
-        git push --force secure-origin gh-pages
