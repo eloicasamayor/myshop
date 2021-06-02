@@ -22,10 +22,10 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Flutter Mate
+      - name: Flutter Latest
         # You may pin to the exact commit or the version.
-        # uses: Techno-Disaster/Flutter-Mate@5a1eb05c542ab8dbda92eec7290f5b79c6371f4e
-        uses: Techno-Disaster/Flutter-Mate@v1.0.0
+        # uses: geowatson/flutter-latest@f71e57a721f066cc8d8d197f77991d5ecbaaec9c
+        uses: geowatson/flutter-latest@1.0.1
         
       - name: Deploy Flutter web app to github pages
         uses: erickzanardo/flutter-gh-pages@v2
