@@ -2,6 +2,9 @@
 Shopping app made with Flutter. This was done following a great [Flutter course in Udemy](https://www.udemy.com/course/learn-flutter-dart-to-build-ios-android-apps/)
 Here I have been writing down the concepts learned in the course.
 
+## Deployment
+You can see the web app deployed at [GitHub Pages](https://eloicasamayor.github.io/myshop/#/)
+
 ## Inheritance
 When we use the key "extends" in the class definition, followed by the name of another class we are saying that this new class inherits all properties and methods of the father class. A class can extend maximum from another class. We can override methods and properties, indicating it with the decorator "@override".
 ```dart
