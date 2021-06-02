@@ -22,10 +22,10 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Flutter Latest
+      - name: flutter-cli
         # You may pin to the exact commit or the version.
-        # uses: geowatson/flutter-latest@f71e57a721f066cc8d8d197f77991d5ecbaaec9c
-        uses: geowatson/flutter-latest@1.0.1
+        # uses: steebchen/flutter@55019e0f56278a7c84949e8e17c66e8f79d67290
+        uses: steebchen/flutter@v1.1.0
         
       - name: Deploy Flutter web app to github pages
         uses: erickzanardo/flutter-gh-pages@v2
