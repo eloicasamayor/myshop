@@ -304,7 +304,8 @@ utureBuilder(
         },
       ),
 ```
-## Spread operator
+## Dart operators
+### Spread operator
 Provide a concise way to insert multiple values into a collection.
 
 ```dart
@@ -312,8 +313,7 @@ var list = [1, 2, 3];
 var list2 = [0, ...list];
 assert(list2.length == 4);
 ```
-
-## Cascade operator
+### Cascade operator
 Allow you to make a sequence of operations on the same object. In addition to function calls, you can also access fields on that same object. This often saves you the step of creating a temporary variable and allows you to write more fluid code.
 
 ```dart
@@ -322,9 +322,8 @@ transformConfig.translate(-10.0);
 // it is the same as:
 Matrix4.rotationZrotationZ(-8 * pi / 180)..translate(-10.0);
 ```
-## Null-aware operator
+### Null-aware operator
 The ?? operator returns the expression on its left unless that expression’s value is nul
-
 
 ## Authentication
 In flutter we use **Tokens** to admin the authentication of users. When a user logs in, a token is generated on the server with an algorithm and a private key only known by the server, so the token can't be faked. This token is a long string that is sent to the app and stored on de device. It is stored in the "hard drive", and that allow us to keep the token when the app restarts. In the server it's defined certain endpoints whereas the request must have a token attached, and it won't respond if it is the valid token.
