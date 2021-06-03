@@ -340,3 +340,44 @@ void _autoLogout() {
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 ```
+
+## Saving data in shared preferences
+We use the shared_preferences package to save simple data to the device memory. It can be use to save the auth token, userID and the token expiry date.
+
+```dart
+// saving some variables in the device memory
+Future<void> _saveAuthData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.encode({
+      'token': _token,
+      'userId': _userId,
+      'expiryDate': _expiryDate.toIso8601String(),
+    });
+    prefs.setString('userData', userData);
+}
+// check if the auth token is valid
+Future<bool> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData')) {
+      return false;
+    } else {
+      final extractedUserData = json.decode(prefs.getString('userData')) as Map<String, Object>;
+      DateTime expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+      if (expiryDate.isBefore(DateTime.now())) {
+        return false;
+      }
+      _token = extractedUserData['token'];
+      _userId = extractedUserData['userId'];
+      _expiryDate = expiryDate;
+      return true;
+    }
+  }
+
+// removing data
+Future<void> _removeAuthData() async {
+    //remove a specific data
+    prefs.remove('userData');
+    // remove all data
+    prefs.clear();
+}
+```

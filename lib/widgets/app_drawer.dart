@@ -39,7 +39,10 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(Icons.exit_to_app),
               title: Text('Log out'),
               onTap: () {
+                // we close the drawer
                 Navigator.of(context).pop();
+                // and we go to home screen to avoid errors.
+                Navigator.of(context).pushReplacementNamed('/');
                 Provider.of<Auth>(context, listen: false).logout();
               }),
           Divider(),
