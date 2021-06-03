@@ -9,6 +9,10 @@ import '../models/http_exception.dart';
 class Products with ChangeNotifier {
   //nombramos la variable con la _ para dejar claro que no debe ser accesible desde fuera de la clase.
   //no es final porque cambiará con el tiempo.
+  final String authToken;
+
+  Products(this.authToken, this._items);
+
   List<Product> _items = [
     /*Product(
       id: 'p1',
@@ -65,8 +69,8 @@ class Products with ChangeNotifier {
   // y en ellos nos ocupamos de avisar a los Listeners mediante el notifyListeners()
 
   Future<void> fetchAndSetProducts() async {
-    const url =
-        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json';
+    final url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken';
     // como estamos dentro de "async", podemos usar "await" para esperar por la respuesta
     // almacenamos la respuesta en una variable porque la respuesta contendrá los datos
     try {
@@ -82,7 +86,7 @@ class Products with ChangeNotifier {
           id: prodId,
           title: prodData['title'],
           description: prodData['description'],
-          price: prodData['price'],
+          price: prodData['price'].toDouble(),
           isFavorite: prodData['isFavorite'],
           imageUrl: prodData['imageUrl'],
         ));

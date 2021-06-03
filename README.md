@@ -27,20 +27,55 @@ When we use the key "extends" in the class definition, followed by the name of a
 ## Mixins
 We define a mixin with the key mixin. And we can use this mixin with the key "with" followed by the mixin name in a class definition. When using a mixin, that class will have the methods and properties of the mixin. It is a lot like inheritance, but with mixins the intances of the class are not of mixin' type. It must be used when the connection with the elements is not that strong. We can use multiple mixins at the same time. 
 
+## Interfaces
+When we use the "implements" keyname followed by a ClassName, in the declaration of a class, we are signing a contract: **we compromise to implement all functions this class has**. In Dart, every class invisibly extends Object, **every class is an object**, and that's why every class has the method .toString()
+
+
 ## State Management: using the provider package
+- We will use **StatefulWidget** when the state (the data) only affect that widget or maybe his child<br>
+- We will use the **provider package** when the state affects all the app or multiple places around the widget tree.
 <br> - Building the providers using the within ChangeNotifier and getters to get the data. Using the notifyListeners() functions to alert listeners at any change in the data.
 <br> - Stablishing the Provider in the highest widget in the widget tree where we will need that data using the ChangeNotifierProvider() or ChangeNotifierProvider.value() and referencing the Class.
 <br> - On Children of the Provider widget we can listen the provider in two ways:
 
-### The Provider.of<T>(context) method
+### A) The Provider.of<T>(context) method
 With Provider.of<ClassName>(context). We rebuild the entire widget on every change in the provider data. unless we add the "listen: false" argument.
 
-### The Consumer() widget 
+### B) The Consumer() widget 
 With Consumer<ClassName>(builder: (ctx, data, child) => widget), child: child. Here we only rerun wha'ts inside the Consumer widget.
+```dart
+Consumer<Auth>(builder: (ctx, data, _) => MaterialApp(
+  //This MaterialApp widget will rebuild on every change in the Auth() provider (as far as we call NotifyListeners inside Auth, when the change occurs)
+  ),
+),
+```
+
 ### Multiple providers.
-- We will use **StatefulWidget** when the state (the data) only affect that widget or maybe his child<br>
-- We will use the **provider package** when the state affects all the app or multiple places around the widget tree.
-<br>
+- We can define multiple providers using the MultiProvider.
+- If we have a provider that depends on another provider, then we will use Change ChangeNotifierProxyProvider<>(). Between <> we have to pass the provider class that it depends on, and the class we want to provide. Then, there is a "create" argument with a function that must return the object we want to provide and an "update" provide, which will fulfill it using the info from the other provider it depends on.
+
+```dart
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (ctx) => Auth(),
+        ),
+        ChangeNotifierProxyProvider<Auth, Products>(
+          create: (ctx) => Products(null, []),
+          update: (ctx, auth, previousProducts) => Products(
+            auth.token,
+            previousProducts == null ? [] : previousProducts.items,
+          ),
+          // inicializamos la lista de productos con los productos anteriores si los había, y si no con una lista vacía.
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => Cart(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => Orders(),
+        ),
+      ],
+```
 
 ## User inputs and Forms
 - Using the **Snackbar** widget and adding the opction to UNDO.
@@ -202,8 +237,30 @@ void deleteProduct(String id) {
 ```
 
 ### Creating custom Exceptions
-When we use the "implements" keyname followed by a ClassName, in the declaration of a class, we are signing a contract: **we compromise to implement all functions this class has**. In Dart, every class invisibly extends Object, **every class is an object**, and that's why every class has the method .toString()
 
+We can create type of errors creating a class that use the interface Exception. To do that, we will define the class with the "class" keyname with the class name, and then the keyword "implements" and then the name of the Exception class.
+```dart
+class HttpException implements Exception {
+  final String message;
+
+  HttpException(this.message);
+
+  @override
+  String toString() {
+    return message;
+  }
+}
+```
+We could filter an error of this custom type like this:
+```dart
+try {
+  // some code that could fail
+} on HttpException catch (error) {
+  // we go here when an HttpException occurs
+} catch (error){
+  // we go here when other types of errors occur
+}
+```
 ### Managing errors in http requests
 The HTTP package only throws its own errors for GET and POST requests if the server returns an error status code.
 <br>For PATCH, PUT, DELETE, **it doesn't throw error** for error responses from server. So in theese cases a simple try-catch is not enought, we have to get the server response and compare the status code.
@@ -267,4 +324,4 @@ Matrix4.rotationZrotationZ(-8 * pi / 180)..translate(-10.0);
 ```
 
 ## Authentication
-In flutter we use Tokens to admin the authentication of users. When a user logs in, a token is generated on the server with an algorithm and a private key only known by the server. So the token can't be faked. This token is a long string that is sent to the app and stored on de device. It is stored in the "hard drive", and that allow us to keep the token when the app restarts. In the server it's defined certain endpoints whereas the request must have a token attached, and it won't respond if it is the valid token.
+In flutter we use **Tokens** to admin the authentication of users. When a user logs in, a token is generated on the server with an algorithm and a private key only known by the server, so the token can't be faked. This token is a long string that is sent to the app and stored on de device. It is stored in the "hard drive", and that allow us to keep the token when the app restarts. In the server it's defined certain endpoints whereas the request must have a token attached, and it won't respond if it is the valid token.
