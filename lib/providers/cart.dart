@@ -15,6 +15,10 @@ class CartItem {
 }
 
 class Cart with ChangeNotifier {
+  final String authToken;
+
+  Cart(this.authToken, this._items);
+
   // cada cart item estará directamente relacionado con un producto
   // para ello creamos un map (privado) donde se relaciona cada cart item con la id del producto
   Map<String, CartItem> _items = {};

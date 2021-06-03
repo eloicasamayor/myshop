@@ -31,18 +31,30 @@ class MyApp extends StatelessWidget {
           create: (ctx) => Auth(),
         ),
         ChangeNotifierProxyProvider<Auth, Products>(
-          create: (ctx) => Products(null, []),
+          create: (ctx) => Products(null, null, []),
           update: (ctx, auth, previousProducts) => Products(
             auth.token,
+            auth.userId,
             previousProducts == null ? [] : previousProducts.items,
           ),
           // inicializamos la lista de productos con los productos anteriores si los había, y si no con una lista vacía.
         ),
-        ChangeNotifierProvider(
-          create: (ctx) => Cart(),
+        ChangeNotifierProxyProvider<Auth, Cart>(
+          create: (ctx) => Cart(null, {}),
+          update: (ctx, auth, previousCartItems) => Cart(
+            auth.token,
+            previousCartItems == null ? [] : previousCartItems.items,
+          ),
+          // inicializamos la lista de productos con los productos anteriores si los había, y si no con una lista vacía.
         ),
-        ChangeNotifierProvider(
-          create: (ctx) => Orders(),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          create: (ctx) => Orders(null, null, []),
+          update: (ctx, auth, previousOrderData) => Orders(
+            auth.token,
+            auth.userId,
+            previousOrderData == null ? [] : previousOrderData.orders,
+          ),
+          // inicializamos la lista de productos con los productos anteriores si los había, y si no con una lista vacía.
         ),
       ],
 

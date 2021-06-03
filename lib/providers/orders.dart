@@ -18,6 +18,10 @@ class OrderItem {
 }
 
 class Orders with ChangeNotifier {
+  final String authToken;
+  final String userId;
+  Orders(this.authToken, this.userId, this._orders);
+
   List<OrderItem> _orders = [];
 
   List<OrderItem> get orders {
@@ -25,8 +29,9 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
-    const url =
-        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/orders.json';
+    final url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/orders/$userId.json?auth=$authToken';
+    print(url);
     final timestamp = DateTime.now();
     try {
       final response = await http.post(
@@ -41,7 +46,7 @@ class Orders with ChangeNotifier {
                       'id': cp.id,
                       'title': cp.title,
                       'quantity': cp.quantity,
-                      'price': cp.price,
+                      'price': cp.price.toDouble(),
                     })
                 .toList(),
           },
@@ -64,8 +69,8 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     //print('fetchAndSetOrders');
-    const url =
-        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/orders.json';
+    final url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/orders/$userId.json?auth=$authToken';
     try {
       final response = await http.get(Uri.parse(url));
       // sabemos que el map contiene un map para cada string, pero Flutter daría error si lo ponemos. hay que poner "dynamic"
@@ -79,18 +84,16 @@ class Orders with ChangeNotifier {
         loadedOrders.add(
           OrderItem(
             id: orderId,
-            amount: orderData['amount'],
+            amount: orderData['amount'].toDouble(),
             dateTime: DateTime.parse(orderData['dateTime']),
-            products: (orderData['products'] as List<dynamic>)
-                .map(
-                  (item) => CartItem(
-                    id: item['id'],
-                    price: item['price'],
-                    quantity: item['quantity'],
-                    title: item['title'],
-                  ),
-                )
-                .toList(),
+            products: (orderData['products'] as List<dynamic>).map((item) {
+              return CartItem(
+                id: item['id'],
+                price: item['price'].toDouble(),
+                quantity: item['quantity'],
+                title: item['title'],
+              );
+            }).toList(),
           ),
         );
       });

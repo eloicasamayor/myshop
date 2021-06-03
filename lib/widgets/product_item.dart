@@ -5,6 +5,7 @@ import '../screens/product_detail_screen.dart';
 
 import '../providers/product.dart';
 import '../providers/cart.dart';
+import '../providers/auth.dart';
 
 class ProductItem extends StatefulWidget {
   //final String id;
@@ -25,6 +26,7 @@ class _ProductItemState extends State<ProductItem> {
     // obtengo la info del provider que nececito para crear los widgets, pero le digo que no esté escuchando a los cambios
     // porque lo único que puede cambiar es el icono de favorito, y ahí crearé un Consumer
     // El Consumer sí escuchará los cambios en Product, pero no rehará todo el widget sino solo lo que está dentro de él.
+    final authData = Provider.of<Auth>(context, listen: false);
     return ClipRRect(
       // ClipRRect -> fuerza su hijo a tener cierta forma
       borderRadius: BorderRadius.circular(10),
@@ -54,7 +56,8 @@ class _ProductItemState extends State<ProductItem> {
                 product.isFavorite ? Icons.favorite : Icons.favorite_border,
               ),
               onPressed: () async {
-                await product.toggleFavoriteStatus();
+                await product.toggleFavoriteStatus(
+                    authData.token, authData.userId);
               },
               color: Theme.of(context).accentColor,
             ),

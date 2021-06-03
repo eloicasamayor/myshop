@@ -10,8 +10,9 @@ class Products with ChangeNotifier {
   //nombramos la variable con la _ para dejar claro que no debe ser accesible desde fuera de la clase.
   //no es final porque cambiará con el tiempo.
   final String authToken;
+  final String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this.userId, this._items);
 
   List<Product> _items = [
     /*Product(
@@ -68,9 +69,13 @@ class Products with ChangeNotifier {
   //nos aseguramos que sólo se modificará a través de estos métodos,
   // y en ellos nos ocupamos de avisar a los Listeners mediante el notifyListeners()
 
-  Future<void> fetchAndSetProducts() async {
-    final url =
-        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken';
+  //argument between square brackets: mean they are optional
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    //si filterByUser es true, le pasaremos el filtro por usuario en la url.
+    final filterString =
+        filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    var url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken&$filterString';
     // como estamos dentro de "async", podemos usar "await" para esperar por la respuesta
     // almacenamos la respuesta en una variable porque la respuesta contendrá los datos
     try {
@@ -80,6 +85,10 @@ class Products with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+      url =
+          'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/userFavorites/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(Uri.parse(url));
+      final favoriteData = json.decode(favoriteResponse.body);
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -87,7 +96,8 @@ class Products with ChangeNotifier {
           title: prodData['title'],
           description: prodData['description'],
           price: prodData['price'].toDouble(),
-          isFavorite: prodData['isFavorite'],
+          isFavorite:
+              favoriteData == null ? false : favoriteData[prodId] ?? false,
           imageUrl: prodData['imageUrl'],
         ));
       });
@@ -102,8 +112,8 @@ class Products with ChangeNotifier {
   // por eso definimos el future así: Future<void>
   Future<void> addProduct(Product product) async {
     // código asíncrono (asynchronous, "async") -> significa que ejecuta una lógica mientras otro código continua ejecutándose
-    const url =
-        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json';
+    final url =
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken';
     // con la key "await" le decimos a Dart que tiene que 'esperarse' a que termine. podemos usar "await" porque estamos dentro de una funcion o método async
     try {
       final response = await http.post(
@@ -114,7 +124,7 @@ class Products with ChangeNotifier {
             'description': product.description,
             'imageUrl': product.imageUrl,
             'price': product.price,
-            'isFavorite': product.isFavorite,
+            'creatorId': userId,
           },
         ),
       );
@@ -137,7 +147,7 @@ class Products with ChangeNotifier {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
       final url =
-          'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+          'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$authToken';
       try {
         await http.patch(
           Uri.parse(url),
@@ -160,7 +170,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final url =
-        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json';
+        'https://myshop-flutter-51303-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$authToken';
     // optimistic updating -> esta tecnica de actualizar datos sin usar Future
     // guardamos el valor antiguo
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
