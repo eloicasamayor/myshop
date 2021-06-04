@@ -341,7 +341,7 @@ void _autoLogout() {
   }
 ```
 
-## Saving data in shared preferences
+## Saving data in device memory
 We use the shared_preferences package to save simple data to the device memory. It can be use to save the auth token, userID and the token expiry date.
 
 ```dart
@@ -381,3 +381,56 @@ Future<void> _removeAuthData() async {
     prefs.clear();
 }
 ```
+
+## Animations
+### First approach: controlling an animation from scratch
+- We need to be in a StatefulWidget using the mixin "SingleTickerProviderStateMixin" (it will allow us to use the "this" keywork to configure vsync parameter in the controller)
+- We create an **AnimationController** that we will use to start or revert the animation. It takes 2 arguments:
+  - vsync: we have to provide "this". (it is provided by the SingleTickerProviderStateMixin mixin)
+  - duration: we can provide 2 durations, for forward and reversed, or one for both. We have to provide a Duration() object.
+- We set up an **Animation**. This is a generic type, so we have to add a <type> on the right to tell flutter what we want to animate. This object will have all the configurations of the animation.
+  - We use an instance of the **Tween()** class, with provides an object that knows how to animate between 2 values. It's also a generic class, so we should provide what to animate. I takes 2 arguments:
+    - begin: we provide the object to animate with the properties in the beginning
+    - end: the object to animate with the properties in the ending of the animation 
+  - We call **.animate()** to create the Animation object we have to provide. We will pass an
+    - Animation Object, for example, the CurvedAnimation() constructor. We provide:
+        - parent: a pointer to the controller
+        - curve: we can choose between the properties of **Curves**: linear, easeIn, easeOut...
+- Both objects have to be configured when the State object is created, so in the initState().
+- We have to add a Listener to listen for any changes on the Animation Object and call setState() every time it changes, so build() is called, so the screen is redrawed.
+
+```dart
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _heightAnimation = Tween<Size>(
+      begin: Size(
+        double.infinity,
+        260,
+      ),
+      end: Size(
+        double.infinity,
+        320,
+      ),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn,
+      ),
+    );
+    // when it changes, it needs to call setState
+    _heightAnimation.addListener(() => setState(() {}));
+  }
+```
+
+- We connect the animation with the widget by assigning the animation to some parameter, for example the height.
+
+```dart
+height: _heightAnimation.value.height,
+```
+- To trigger the animation, we call _controller.forward() or _controller.reverse().
+
+
+
