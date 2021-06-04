@@ -384,20 +384,20 @@ Future<void> _removeAuthData() async {
 
 ## Animations
 ### First approach: controlling an animation from scratch
-- We need to be in a StatefulWidget using the mixin "SingleTickerProviderStateMixin" (it will allow us to use the "this" keywork to configure vsync parameter in the controller)
+- We need to be in a **StatefulWidget** using the mixin **SingleTickerProviderStateMixin** (it will allow us to use the "this" keywork to configure vsync parameter in the controller)
 - We create an **AnimationController** that we will use to start or revert the animation. It takes 2 arguments:
-  - vsync: we have to provide "this". (it is provided by the SingleTickerProviderStateMixin mixin)
-  - duration: we can provide 2 durations, for forward and reversed, or one for both. We have to provide a Duration() object.
+  - **vsync**: we have to provide "this". (it is provided by the SingleTickerProviderStateMixin mixin)
+  - **duration**: we can provide 2 durations, for forward and reversed, or one for both. We have to provide a Duration() object.
 - We set up an **Animation**. This is a generic type, so we have to add a <type> on the right to tell flutter what we want to animate. This object will have all the configurations of the animation.
   - We use an instance of the **Tween()** class, with provides an object that knows how to animate between 2 values. It's also a generic class, so we should provide what to animate. I takes 2 arguments:
-    - begin: we provide the object to animate with the properties in the beginning
-    - end: the object to animate with the properties in the ending of the animation 
+    - **begin**: we provide the object to animate with the properties in the beginning
+    - **end**: the object to animate with the properties in the ending of the animation 
   - We call **.animate()** to create the Animation object we have to provide. We will pass an
     - Animation Object, for example, the CurvedAnimation() constructor. We provide:
-        - parent: a pointer to the controller
-        - curve: we can choose between the properties of **Curves**: linear, easeIn, easeOut...
-- Both objects have to be configured when the State object is created, so in the initState().
-- We have to add a Listener to listen for any changes on the Animation Object and call setState() every time it changes, so build() is called, so the screen is redrawed.
+        - **parent**: a pointer to the controller
+        - **curve**: we can choose between the properties of **Curves**: linear, easeIn, easeOut...
+- Both objects have to be configured when the State object is created, so in the **initState()**.
+- We have to add a Listener to listen for any changes on the Animation Object and **call setState()** every time it changes, so build() is called, so the screen is redrawed.
 
 ```dart
   @override
@@ -430,7 +430,45 @@ Future<void> _removeAuthData() async {
 ```dart
 height: _heightAnimation.value.height,
 ```
-- To trigger the animation, we call _controller.forward() or _controller.reverse().
+- To trigger the animation, we call **_controller.forward()** or **_controller.reverse()**.
 
+### The AnimatedBuilder widget
+- It allows us to rebuild only the part of the widget tree that we want to animate, not all the screen, so it's more efficient than call setState() for every animation frame. It takes some arguments:
+  - animation: we provoide the animation created in the initState
+  - builder: an annonymous function that
+    - takes 2 arguments: context and child (this child won't be rebuilt)
+    - returns a widget (or widget tree) that we want to animate
+  - child: a widget tree that it will not be rebuilt.
 
+```dart
+AnimatedBuilder(
+        animation: _heightAnimation,
+        builder: (ctx, ch) => Container(
+          height: _heightAnimation.value.height,
+          child: ch,
+        ),
+        child: Form(
+              //the widget tree that won't rebuild with the animation
+            ),
+          ),
+```
 
+### The AnimatedContainer widget
+- AnimatedContainer has all the logic built in and it **automatically transitions between changes in its configuration**.
+- So in any change in hight, width, padding... it will not make a hard switch between the old and the new value, but it will smoothly animate between them.
+- We **don't need to create a Controller neither an Animation object**.
+- We have to provide:
+  - **duration**: a Duration() object
+  - **curve**: Curves.easeIn, etc
+
+```dart
+AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+        height: _authMode == AuthMode.Signup ? 320 : 260,
+        constraints: BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+        width: deviceSize.width * 0.75,
+        padding: EdgeInsets.all(16.0),
+        child: //the widget tree inside the container
+        ),
+```
