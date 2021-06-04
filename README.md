@@ -1,11 +1,11 @@
 # myshop flutter app: learning to build flutter apps
 Shopping app made with Flutter. This was done following a great [Flutter course in Udemy](https://www.udemy.com/course/learn-flutter-dart-to-build-ios-android-apps/)
 
-Here I have been writing down the concepts I learned in the course.
-
 ## Deployment
 You can see the web app deployed at [GitHub Pages](https://eloicasamayor.github.io/myshop/#/)
 
+# Learning notes
+>Here I have been writing down the concepts I learned in the course.
 ## Inheritance
 When we use the key "extends" in the class definition, followed by the name of another class we are saying that this new class inherits all properties and methods of the father class. A class can extend maximum from another class. We can override methods and properties, indicating it with the decorator "@override".
 ```dart
@@ -472,3 +472,13 @@ AnimatedContainer(
         child: //the widget tree inside the container
         ),
 ```
+
+### Other Animation widgets
+- **FadeTransition** allow us to animate the opacity of a widget. We have to provide an Animation<double> object to the opacity attribute.
+```dart
+FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: //the childs will also fade
+),
+```
+- **SlideTransition** allow us to animate the offset of a widget. We have to provide an Animation<Offset> object to the opacity attribute.
