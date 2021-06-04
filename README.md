@@ -111,7 +111,7 @@ One logic executes while other function is still running. Its convenient when we
 ## Error handling
 - .catchError will run if there is an error in http.post() or in .then(). If there were an error in http.post(), it will no run the .then() so it will go directly to the .catchError()
 - we can handle here the error, and we can throw it again with the "throw" key. Then, the place where we called addProduct(), who is waiting for the response of the Future, will receive the error with the  .catchError() (it would also catch the error if we wouldn't do the .catchError here). So, the error is only catched with the first .catchError in line.
-- HTTP Request example using Future<>, .then() and .catchError()
+> HTTP Request example using Future<>, .then() and .catchError()
 
 ```dart
 Future<void> addProduct(Product product) {
@@ -135,7 +135,7 @@ Future<void> addProduct(Product product) {
     });
   }
 ```
-<br>HTTP Request example using async & await and try{}catch{}
+> HTTP Request example using async & await and try{}catch{}
 
 ```dart
   Future<void> addProduct(Product product) async {
@@ -160,23 +160,23 @@ Future<void> addProduct(Product product) {
     }
   }
 ```
-<br>With the try-catch, it will try to run the code inside "try", and if it fails, the "catch" will be executed. The code inside "finally" should execute no matters there was an error or not.
-<br>The async method or function returns a Future.
+With the try-catch, it will try to run the code inside "try", and if it fails, the "catch" will be executed. The code inside "finally" should execute no matters there was an error or not.
+The async function returns a Future.
 
 ### We cannot use initState in some cases
 - **We cannot use .of(context) inside the initState() method**. That's because here the widget is not fully loaded yet. There are 3 posible workarrounds:
-<br> A) when using Provider.of<class>(context), it will work when we don't want to listen, like this: 
+  - When using Provider.of<class>(context), it will work when we don't want to listen, like this: 
 
 ```dart
 Provider.of<ClassOfTheProvider>(context, listen: false)
 ```
-<br> B) Create a Future (with the helper constructor Future.delayed()) with zero duration and inside it use the Provider.of(context)
+  - Create a Future (with the helper constructor **Future.delayed()**) with zero duration and inside it use the Provider.of(context)
 ```dart
 Future.delayed(Duration.zero).then(_){
   Provider.of<ClassOfTheProvider>(context).methodWeWantToCall()
 }
 ```
-<br> C) Use it inside didChangeDependencies(). This method runs multiple times, that's why we have to work with a flag variable when using this approach:
+  - Use it inside **didChangeDependencies()**. This method runs multiple times, that's why we have to work with a flag variable when using this approach:
 
 ```dart
 var _isInit = true;
@@ -482,3 +482,9 @@ FadeTransition(
 ),
 ```
 - **SlideTransition** allow us to animate the offset of a widget. We have to provide an Animation<Offset> object to the opacity attribute.
+
+- **FadeInImage()** wraps an image and provides a provisional image that is shown while the real image is loading, and then it fades to the image. It takes
+  - placeholder: an image provider (here we would use the local asset)
+  - image provider (here we would set the NetworkImage)
+
+- **Hero** wraps an image and is kept in a transition to a new screen and it animates to fit the new position and size in the new screen. We should wrap the two images in the 2 screens and also we have to provide a unique **tag** (the same in the 2) to tell flutter which images have to be connected in the transition.
