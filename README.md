@@ -25,7 +25,7 @@ When we use the key "extends" in the class definition, followed by the name of a
   
 
 ## Mixins
-We define a mixin with the key "with" followed by the mixin name in a class definition. When using a mixin, that class will have the methods and properties of the mixin. It is a lot like inheritance, but with mixins the intances of the class are not of mixin' type. It must be used when the connection with the elements is not that strong. We can use multiple mixins at the same time. 
+We define a mixin with the key **with** followed by the mixin name in a class definition. When using a mixin, the class will have the methods and properties of the mixin. It is a lot like inheritance, but with mixins the intances of the class are not of mixin' type. It must be used when the connection with the elements is not that strong. We can use multiple mixins at the same time. 
 
 ## Interfaces
 When we use the "implements" keyname followed by a ClassName, in the declaration of a class, we are signing a contract: **we compromise to implement all functions this class has**. In Dart, every class invisibly extends Object, **every class is an object**, and that's why every class has the method .toString()
@@ -488,3 +488,36 @@ FadeTransition(
   - image provider (here we would set the NetworkImage)
 
 - **Hero** wraps an image and is kept in a transition to a new screen and it animates to fit the new position and size in the new screen. We should wrap the two images in the 2 screens and also we have to provide a unique **tag** (the same in the 2) to tell flutter which images have to be connected in the transition.
+
+- With **Slivers** we can do de effect of the main image of the screen becoming the appBar when we scroll down. We can implement 
+  - Having a CustomScrollView. It takes some argumets:
+    - slivers: it takes a list of slivers (scrollable areas on the screen). We have to include:
+      - SliverAppBar(): it takes expandedHeight, (bool) pinned, and (FlexibleSpaceBar)flexibleSpace. it takes:
+        - title: the text title of the appbar
+        - background: here we use the main image.
+      - SliverList(): it takes a "delegate" argument, where we will put the widget tree to scroll.
+
+### Custom Route Transitions
+- By default there is always the same animation for the route transitions (changing from one screen to another). But we can create our own transitions. We do it by creating a class that extends **PageTransitionsBuilder()**
+> Example of custom FadeTransitions route transition:
+
+```dart
+class CustomPageTransitionBuilder extends PageTransitionsBuilder {
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    if (route.settings.name == '/') {
+      return child;
+    }
+    return FadeTransition(
+      opacity: animation,
+      child: child,
+    );
+  }
+}
+```

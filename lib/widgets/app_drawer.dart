@@ -5,6 +5,8 @@ import '../screens/orders_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 
+import '../helpers/custom_route.dart';
+
 class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,9 @@ class AppDrawer extends StatelessWidget {
             title: Text('Orders'),
             onTap: () => Navigator.of(context)
                 .pushReplacementNamed(OrdersScreen.routeName),
+            //onTap: () => Navigator.of(context).pushReplacement(
+            //  CustomRoute(builder: (ctx) => OrdersScreen()),
+            //),
           ),
           Divider(),
           ListTile(
