@@ -1,8 +1,11 @@
-# myshop flutter app: learning to build flutter apps
+# myshop app
+
+> *Learning Flutter: Chapter IV*
+
 Shopping app made with Flutter. This was done following a great [Flutter course in Udemy](https://www.udemy.com/course/learn-flutter-dart-to-build-ios-android-apps/)
 
 ## Deployment
-You can see the web app deployed at [GitHub Pages](https://eloicasamayor.github.io/myshop/#/)
+You can see the deployed web app on [GitHub Pages](https://eloicasamayor.github.io/myshop/#/)
 
 # Learning notes
 >Here I have been writing down the concepts I learned in the course.
