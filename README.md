@@ -98,21 +98,12 @@ TextFormField() inside a Form are directly connected to that parent form.
 ### Saving the data
 globalKeyInstance.currentState.save() will trigger every "onSave" method in every TextFormField widget in the form. 
 ```dart
-void _saveForm(){
   _form.currentState.save();
-}
 ```
 The function passed on the onSaved argument gets the value entered on the input. For example we can create a new instance of an object with the new value provided.
 ```dart
 onSaved: (value) {
-  _editedProduct = Product(
-    id: _editedProduct.id,
-    title: _editedProduct.title,
-    description: _editedProduct.description,
-    price: double.parse(value),
-    imageUrl: _editedProduct.imageUrl,
-    isFavorite: _editedProduct.isFavorite,
-  );
+  _userEmail = value as String;
 },
 ```
 
@@ -136,12 +127,16 @@ If it return null, it would be as "there is no error". It it returns a text, thi
 ```
 This function can be called:
 - With the autovalidate argument in the Form widget, i will run on every key stroke on the input.
-- We can trigger all validator functions in every input in the Form by calling currentState.validate(). This will return true if there are no errors, or false if there is an error 
+- We can trigger all validator functions in every input in the Form by calling currentState.validate(). This will return true if there are no errors, or false if there is an error. A common pattern is to save the returning value of validate() and check it before calling save():
 ```dart
-final _isValid = _form.currentState.validate()
+void _trySubmit() {
+  final _isValid = _form.currentState!.validate();
+  if (_isValid) {
+    _form.currentState!.save();
+    //use values to send auth request...
+    }
+}
 ```
-
-
 
 ## HTTP Requests
 
