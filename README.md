@@ -87,8 +87,9 @@ Widget to show a **message at the bottom** of the screen. We can add a button wi
 Widget to show a **window with a text and one or more buttons**. It allow us to do something depending on the user response.
 
 ## Forms
-The **Form()** widget helps us with collecting user input and with validation as well, so we don't have to create a TextEditingController for every input and validate the inputs in custom functions. The Form widget itself is invisible, but inside it we can use special input widgets that **can be validated and saved together in a simple way**. It takes a child argument where you put the widget tree.
-We have to asign another argument: the key, declared as:
+The **Form()** widget helps us with collecting user input and with validation as well, so we don't have to create a TextEditingController for every input and validate the inputs in custom functions. The Form widget itself is invisible, but inside it we can use special input widgets that **can be validated and saved together in a simple way**. It takes 
+- The **child** argument, where we put the widget tree.
+- the unique key (of type GlobalKey<FormState>), declared as:
 ```dart
 final _form = GlobalKey<FormState>();
 ```
