@@ -99,6 +99,22 @@ void _saveForm(){
 - **Validating**: globalKeyInstance.currentState.validate() will trigger every "validator" method in every TextFormField in the form.
 in every TextFormField in the form we can add a "validator:" argument. "validator" takes a function with takes a value (the value entered in the textFormField by the user) and returns something.
 If it return null, it would be as "there is no error". It it returns a text, this text is treated as the error text = the message you want to show to the user.
+```dart
+  validator: (value) {
+    if (value.isEmpty) {
+      return 'Please provide a value';
+    }
+
+    return null;
+  },
+```
+This function can be called:
+- With the autovalidate argument in the Form widget, i will run on every key stroke on the input.
+- We can trigger all validator functions in every input in the Form by calling currentState.validate of the globalkey: 
+```dart
+_form.currentState.validate()
+```
+
 
 
 ## HTTP Requests
