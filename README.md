@@ -88,25 +88,46 @@ We have to asign another argument: the key, declared as:
 ```dart
 final _form = GlobalKey<FormState>();
 ```
+TextFormField() inside a Form are directly connected to that parent form.
 
-- TextFormField() can be used inside a Form and are directly connected to that parent form.
-- **Saving the data**: globalKeyInstance.currentState.save() will trigger every "onSave" method in every TextFormField widget in the form. The function of the onSaved argument gets the value entered on the input.
+### Saving the data
+globalKeyInstance.currentState.save() will trigger every "onSave" method in every TextFormField widget in the form. 
 ```dart
 void _saveForm(){
   _form.currentState.save();
 }
 ```
-- **Validating**: globalKeyInstance.currentState.validate() will trigger every "validator" method in every TextFormField in the form.
+The function passed on the onSaved argument gets the value entered on the input. For example we can create a new instance of an object with the new value provided.
+```dart
+onSaved: (value) {
+  _editedProduct = Product(
+    id: _editedProduct.id,
+    title: _editedProduct.title,
+    description: _editedProduct.description,
+    price: double.parse(value),
+    imageUrl: _editedProduct.imageUrl,
+    isFavorite: _editedProduct.isFavorite,
+  );
+},
+```
+
+### Validate the data
 in every TextFormField in the form we can add a "validator:" argument. "validator" takes a function with takes a value (the value entered in the textFormField by the user) and returns something.
 If it return null, it would be as "there is no error". It it returns a text, this text is treated as the error text = the message you want to show to the user.
 ```dart
-  validator: (value) {
-    if (value.isEmpty) {
-      return 'Please provide a value';
-    }
-
-    return null;
-  },
+ validator: (value) {
+  if (value.isEmpty) {
+    return 'Please provide a price';
+  }
+  if (double.tryParse(value) == null) {
+    return 'Please enter a valid number';
+  }
+  if ((double.parse(value) <= 0) ||
+      (double.parse(value) >= 1000)) {
+    return 'Please provide a value between 0 and 10000';
+  }
+  return null;
+},
 ```
 This function can be called:
 - With the autovalidate argument in the Form widget, i will run on every key stroke on the input.
