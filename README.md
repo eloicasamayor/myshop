@@ -80,10 +80,14 @@ Consumer<Auth>(builder: (ctx, data, _) => MaterialApp(
       ],
 ```
 
-## User inputs and Forms
-- Using the **Snackbar** widget and adding the opction to UNDO.
-- Using the **Alert** widget and do something depending on the user response.
-- The **Form()** widget helps us with collecting user input and with validation as well, so we don't have to create a TextEditingController for every input and validate the inputs in custom functions. The Form widget itself is invisible, but inside it we can use special input widgets that can be validated and saved together in a simple way. It takes a child argument where you put the widget tree.
+## output widgets
+### Snackbar 
+Widget to show a message at the bottom of the screen. We can add a button with the opction to UNDO, for example.
+## Alert
+Widget to show a window with a text and one or more buttons. It allow us to do something depending on the user response.
+
+## Forms
+The **Form()** widget helps us with collecting user input and with validation as well, so we don't have to create a TextEditingController for every input and validate the inputs in custom functions. The Form widget itself is invisible, but inside it we can use special input widgets that can be validated and saved together in a simple way. It takes a child argument where you put the widget tree.
 We have to asign another argument: the key, declared as:
 ```dart
 final _form = GlobalKey<FormState>();
