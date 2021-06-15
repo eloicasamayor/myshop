@@ -136,9 +136,9 @@ If it return null, it would be as "there is no error". It it returns a text, thi
 ```
 This function can be called:
 - With the autovalidate argument in the Form widget, i will run on every key stroke on the input.
-- We can trigger all validator functions in every input in the Form by calling currentState.validate of the globalkey: 
+- We can trigger all validator functions in every input in the Form by calling currentState.validate(). This will return true if there are no errors, or false if there is an error 
 ```dart
-_form.currentState.validate()
+final _isValid = _form.currentState.validate()
 ```
 
 
