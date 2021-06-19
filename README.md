@@ -561,3 +561,26 @@ class CustomPageTransitionBuilder extends PageTransitionsBuilder {
   }
 }
 ```
+
+### Gradients
+We can create gradients with the the gradient argument og the BoxDecoration, which takes a LinearGradient object. It takes some argumets:
+- colors: list of the colors in the gradient
+- begin: where the gradient starts
+- end: where it ends
+- stops
+
+```dart
+Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromRGBO(215, 117, 255, 1).withOpacity(0.5),
+                  Color.fromRGBO(255, 188, 117, 1).withOpacity(0.9),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: [0, 1],
+              ),
+            ),
+          ),
+          ```
